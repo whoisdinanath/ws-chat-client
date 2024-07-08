@@ -1,13 +1,14 @@
+// src/users/Login.js
 import React, { useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
-const Login = ({ setAuth }) => {
+
+const Login = ({ setAuth, navigateToSignUp }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
       const response = await fetch('http://localhost:5000/api/v1/auth/signin', {
         method: 'POST',
@@ -25,10 +26,12 @@ const Login = ({ setAuth }) => {
       const result = await response.json();
       const token = result.data.token;
       const decoded = jwtDecode(token);
-    if (!token || !decoded.user_id) {
-    throw new Error('No token or userId received');
-    }
-    setAuth({ token, userId: decoded.user_id, userName: decoded.username, isAdmin: decoded.is_admin });
+            
+      if (!token || !decoded.user_id) {
+        throw new Error('No token or userId received');
+      }
+
+      setAuth({ token, userId: decoded.user_id, userName: decoded.username, isAdmin: decoded.is_admin });
     } catch (err) {
       console.error('Login error:', err);
       setError(err.message);
@@ -68,6 +71,12 @@ const Login = ({ setAuth }) => {
         >
           Login
         </button>
+        <div className="mt-4 text-sm text-center">
+          Don't have an account?{' '}
+          <button onClick={navigateToSignUp} className="text-blue-500 hover:underline">
+            Sign Up
+          </button>
+        </div>
       </form>
     </div>
   );

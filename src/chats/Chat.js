@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import io from 'socket.io-client';
 
 const Chat = ({ chatId, chatName, userId, userName, token }) => {
@@ -8,6 +8,7 @@ const Chat = ({ chatId, chatName, userId, userName, token }) => {
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState('');
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     const fetchOldMessages = async () => {
@@ -58,6 +59,13 @@ const Chat = ({ chatId, chatName, userId, userName, token }) => {
       };
     }
   }, [chatId, userId, token]);
+
+  // Scroll to the bottom when messages change
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
   const sendMessage = async () => {
     if (!message.trim() && attachments.length === 0) {
@@ -112,7 +120,7 @@ const Chat = ({ chatId, chatName, userId, userName, token }) => {
       throw new Error('File upload failed');
     }
     const { originalName, uploadedName, filePath, fileType } = result.data[0];
-    console.log('Uploaded file:', { originalName, uploadedName, filePath, fileType })
+    console.log('Uploaded file:', { originalName, uploadedName, filePath, fileType });
     return { originalName, uploadedName, filePath, fileType };
   };
 
@@ -214,10 +222,10 @@ const Chat = ({ chatId, chatName, userId, userName, token }) => {
   };
 
   return (
-    <div className=" bg-gray-100">
+    <div className="bg-gray-100">
       <div className="max-w-screen-lg mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">Chat Room: {chatName}</h1>
-        <div className="mb-4 h-64 overflow-y-auto">
+        <div className="mb-4 h-64 overflow-y-auto" style={{ overflowAnchor: 'none' }}>
           {messages.map((msg, index) => (
             <div key={index} className="mb-2">
               <strong>{msg.senderName || msg.sendername}</strong>: {msg.message}
@@ -226,6 +234,8 @@ const Chat = ({ chatId, chatName, userId, userName, token }) => {
               </div>
             </div>
           ))}
+          {/* Dummy div to scroll into view */}
+          <div ref={messagesEndRef} />
         </div>
         <div className="flex items-center">
           <button
