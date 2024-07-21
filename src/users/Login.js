@@ -1,16 +1,27 @@
-// src/users/Login.js
 import React, { useState } from 'react';
-import { jwtDecode } from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode';
+import '../styles/Spinner.css';  // Make sure to import the spinner styles
+
+
+const Spinner = () => (
+  <div className="spinner">
+    <div className="double-bounce1"></div>
+    <div className="double-bounce2"></div>
+  </div>
+);
 
 const Login = ({ setAuth, navigateToSignUp }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError('');
     try {
-      const response = await fetch('http://localhost:5000/api/v1/auth/signin', {
+      const response = await fetch('https://electrocord.onrender.com/api/v1/auth/signin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -18,12 +29,22 @@ const Login = ({ setAuth, navigateToSignUp }) => {
         body: JSON.stringify({ email, password }),
         credentials: 'include',
       });
+      // const response = await fetch('http://localhost:5000/api/v1/auth/signin', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({ email, password }),
+      //   credentials: 'include',
+      // });
 
       if (!response.ok) {
         throw new Error('Invalid credentials');
       }
 
       const result = await response.json();
+      console.log('Login result:', result);
+      console.log('Cookie: ', document.cookie);
       const token = result.data.token;
       const decoded = jwtDecode(token);
             
@@ -35,6 +56,8 @@ const Login = ({ setAuth, navigateToSignUp }) => {
     } catch (err) {
       console.error('Login error:', err);
       setError(err.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -69,7 +92,7 @@ const Login = ({ setAuth, navigateToSignUp }) => {
           type="submit"
           className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
-          Login
+          {isLoading ? <Spinner /> : 'Login'}
         </button>
         <div className="mt-4 text-sm text-center">
           Don't have an account?{' '}

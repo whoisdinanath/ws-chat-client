@@ -9,9 +9,12 @@ const Handler = ({ token, userId, userName, handleLogout }) => {
   useEffect(() => {
     const fetchChats = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/v1/chats/rooms/', {
+        const response = await fetch('https://electrocord.onrender.com/api/v1/chats/rooms/', {
           credentials: 'include', // Ensure cookies, including auth tokens, are sent with the request
         });
+        // const response = await fetch('http://localhost:5000/api/v1/chats/rooms/', {
+        //   credentials: 'include', // Ensure cookies, including auth tokens, are sent with the request
+        // });
 
         if (!response.ok) {
           throw new Error('Failed to fetch chats');

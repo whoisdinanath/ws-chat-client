@@ -9,11 +9,15 @@ const Chat = ({ chatId, chatName, userId, userName, token }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState('');
   const messagesEndRef = useRef(null);
+  const [routines, setRoutines] = useState([]);
 
   useEffect(() => {
     const fetchOldMessages = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/v1/messages/${chatId}`, {
+        // const response = await fetch(`http://localhost:5000/api/v1/messages/${chatId}`, {
+        //   credentials: 'include',
+        // });
+        const response = await fetch(`https://electrocord.onrender.com/api/v1/messages/${chatId}`, {
           credentials: 'include',
         });
         if (!response.ok) {
@@ -27,10 +31,36 @@ const Chat = ({ chatId, chatName, userId, userName, token }) => {
       }
     };
 
+    const fetchRoutines = async () => {
+      try {
+        const response = await fetch('https://electrocord.onrender.com/api/v1/routines/', {
+          credentials: 'include',
+        });
+        // const response = await fetch('http://localhost:5000/api/v1/routines/', {
+        //   credentials: 'include',
+        // });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch routines');
+        }
+        console.log("Fetching routines");
+        const result = await response.json();
+        console.log("Routines: ", result.data);
+        setRoutines(result.data);
+      } catch (error) {
+        console.error('Error fetching routines:', error);
+      }
+    };
+    fetchRoutines();
+
+    console.log("Displaying routines: ", routines);
     if (token && chatId) {
-      const newSocket = io('http://localhost:5000/', {
+      const newSocket = io('https://electrocord.onrender.com', {
         auth: { token },
       });
+      // const newSocket = io('http://localhost:5000', {
+      //   auth: { token },
+      // });
       setSocket(newSocket);
 
       newSocket.on('connect', () => {
@@ -110,10 +140,15 @@ const Chat = ({ chatId, chatName, userId, userName, token }) => {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch('http://localhost:5000/api/v1/attachments/upload', {
+    const response = await fetch('https://electrocord.onrender.com/api/v1/attachments/upload', {
       method: 'POST',
       body: formData,
     });
+
+    // const response = await fetch('http://localhost:5000/api/v1/attachments/upload', {
+    //   method: 'POST',
+    //   body: formData,
+    // });
 
     const result = await response.json();
     if (!response.ok) {

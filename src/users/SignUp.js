@@ -21,13 +21,20 @@ const SignUp = ({ setAuth, navigateToLogin }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/v1/auth/signup', {
+      const response = await fetch('https://electrocord.onrender.com/api/v1/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ username, fullname, email, dob, password1, password2 }),
       });
+      // const response = await fetch('http://localhost:5000/api/v1/auth/signup', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({ username, fullname, email, dob, password1, password2 }),
+      // });
 
       const result = await response.json();
 
